@@ -3,6 +3,9 @@ class User < ActiveRecord::Base
 has_many :microposts
 attr_accessor :password
 attr_accessible :firstname, :lastname, :email, :location, :timezone, :bio, :privacy, :webpage, :password, :password_confirmation
+
+has_many :microposts, :dependent => :destroy
+
 email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 validates :firstname, :presence => true
 validates :email, :presence => true,
@@ -45,5 +48,9 @@ before_save :encrypt_password
 
     def secure_hash(string)
       Digest::SHA2.hexdigest(string)
+    end
+
+    def feed
+        Micropost.where("user_id = ?", id)
     end
 end
